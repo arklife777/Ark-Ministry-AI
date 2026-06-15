@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One Sermon into Ten Pieces — Ark Ministry AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{--ink:#13243a;--ink-soft:#54637a;--paper:#ffffff;--paper-2:#f4f8fc;--card:#ffffff;--line:#e2eaf3;--brass:#0cbfe0;--brass-deep:#3164b9;--deep:#092b50;--radius:16px}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;color:var(--ink);background:var(--paper);line-height:1.65}
+  h1,h2,h3{font-family:'Sora',sans-serif;font-weight:600;line-height:1.15;letter-spacing:-0.01em}
+  .wrap{max-width:780px;margin:0 auto;padding:0 24px}
+  a{color:var(--brass-deep)}
+  header.bar{background:var(--deep);color:var(--paper);padding:0}
+  .bar-inner{max-width:1120px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Sora',sans-serif;font-weight:600;font-size:18px}
+  .brand .mark{width:30px;height:30px;border-radius:7px;background:#fff;display:grid;place-items:center}
+  .brand .mark::after{content:'';width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:11px solid var(--brass)}
+  .back{color:#cfc9bb;font-size:14px}
+  .head{padding:54px 0 30px}
+  .eyebrow{font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--brass-deep);margin-bottom:14px}
+  .head h1{font-size:42px;margin-bottom:14px}
+  .head p{font-size:18px;color:var(--ink-soft)}
+  .video{margin:18px 0 36px;aspect-ratio:16/9;background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);display:grid;place-items:center;color:var(--ink-soft);text-align:center;padding:24px}
+  .video .play{width:64px;height:64px;border-radius:50%;background:var(--deep);color:var(--paper);display:grid;place-items:center;font-size:24px;margin:0 auto 14px}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px 28px;margin-bottom:18px}
+  .step .num{font-family:'Sora',sans-serif;color:var(--brass-deep);font-weight:600;font-size:15px;margin-bottom:8px}
+  .step h3{font-size:21px;margin-bottom:8px}
+  .step p{color:var(--ink-soft)}
+  .lock{min-height:70vh;display:grid;place-items:center;text-align:center;padding:40px}
+  .lock h2{font-size:30px;margin-bottom:10px}
+  .lock p{color:var(--ink-soft);margin-bottom:22px;max-width:42ch}
+  .btn{font-family:'Inter';font-size:15px;font-weight:500;padding:13px 26px;border-radius:10px;border:none;cursor:pointer;background:var(--deep);color:var(--paper);text-decoration:none;display:inline-block}
+
+  .ghead{position:relative;height:340px;display:flex;align-items:flex-end;overflow:hidden;background:var(--deep)}
+  .ghead-img{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0}
+  .ghead-scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg, rgba(6,24,46,.2) 0%, rgba(6,24,46,.55) 55%, rgba(6,24,46,.92) 100%)}
+  .ghead-inner{position:relative;z-index:2;max-width:780px;margin:0 auto;padding:0 24px 34px;width:100%}
+  .ghead .eyebrow{color:var(--brass);margin-bottom:12px}
+  .ghead h1{font-size:44px;color:#fff;margin-bottom:0;font-weight:800}
+  @media(max-width:680px){.ghead{height:260px}.ghead h1{font-size:30px}}
+  footer{padding:50px 0;color:var(--ink-soft);font-size:14px;text-align:center}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="bar-inner">
+    <div class="brand"><span class="mark"></span> <span style="color:#fff">Ark</span> <span style="color:var(--brass)">Ministry AI</span></div>
+    <a class="back" href="../index.html">← Back to dashboard</a>
+  </div>
+</header>
+
+<div id="gate" style="min-height:60vh;display:grid;place-items:center"><div style="color:var(--ink-soft)">Checking access…</div></div>
+
+<!-- guide content (revealed only to active members) -->
+<main id="content" style="display:none">
+  <div class="ghead">
+    <div class="ghead-img" style="background-image:url('../assets/guide-sermon.png')"></div>
+    <div class="ghead-scrim"></div>
+    <div class="ghead-inner">
+      <div class="eyebrow">Guide 03</div>
+      <h1>One Sermon into Ten Pieces</h1>
+    </div>
+  </div>
+  <div class="wrap" style="padding-top:34px">
+    <p style="font-size:18px;color:var(--ink-soft);margin-bottom:10px">Take Sunday's message and break it into clips, a devotional, a blog post, and study questions — a week of content from one sermon.</p><div class="wrap">
+    <div class="video">
+      <div>
+        <div class="play">▶</div>
+        <strong>Video walkthrough coming here</strong><br>
+        <span style="font-size:14px">Drop in a YouTube/Vimeo embed or screen recording.</span>
+      </div>
+    </div>
+
+    <div class="step"><div class="num">Step 1</div><h3>Pick your passage and audience</h3><p>Decide the scripture and who it's for — youth group, adult small group, new believers. This shapes the tone of everything the AI produces.</p></div>
+    <div class="step"><div class="num">Step 2</div><h3>Use the starter prompt</h3><p>Paste the provided prompt, swap in your passage, and let the AI draft an outline, discussion questions, and leader notes.</p></div>
+    <div class="step"><div class="num">Step 3</div><h3>Refine and personalize</h3><p>Ask for simpler language, more questions, or a specific theological angle. Two or three follow-ups gets it just right.</p></div>
+    <div class="step"><div class="num">Step 4</div><h3>Format and hand it out</h3><p>Turn the result into a clean one-pager you can print or share. We'll show you the fastest way to do this.</p></div>
+  </div>
+  <footer>You're all set. Questions? Ask in the community.</footer>
+</main>
+
+<!-- locked view -->
+<div id="locked" class="lock" style="display:none">
+  <div>
+    <h2>This guide is for members</h2>
+    <p>Start your $12.99/month membership to unlock this guide, the video walkthrough, and the community.</p>
+    <a class="btn" href="../index.html">Go to dashboard</a>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL="https://baqmkktggczzyoldlkal.supabase.co";
+const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJhcW1ra3RnZ2N6enlvbGRsa2FsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0ODk4ODksImV4cCI6MjA5NzA2NTg4OX0.8tRWeRM4vRhIMX-UN1sxjFy7FbATC4kDkKTN0zvNHcc";
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
+(async()=>{
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){ window.location.href="../index.html"; return; }
+  let active=false;
+  try{
+    const {data:p}=await sb.from('profiles').select('subscription_status').eq('id',session.user.id).single();
+    active = p && p.subscription_status==='active';
+  }catch(e){}
+  document.getElementById('gate').style.display='none';
+  document.getElementById(active?'content':'locked').style.display = active?'block':'grid';
+})();
+</script>
+</body>
+</html>
