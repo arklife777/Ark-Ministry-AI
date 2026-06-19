@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create a Study Guide with AI — Ark Ministry AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --navy:#092b50; --navy-2:#0d3a68; --royal:#3164b9; --cyan:#0cbfe0; --cyan-soft:#e3f7fc;
+    --ink:#13243a; --ink-soft:#54637a; --bg:#ffffff; --bg-2:#f4f8fc; --bg-3:#eef4fa;
+    --card:#ffffff; --line:#e2eaf3; --ok:#1f9d6b; --amber:#b7791f; --amber-soft:#fdf6e8;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.65}
+  h1,h2,h3,h4{font-family:'Sora',sans-serif;font-weight:700;line-height:1.12;letter-spacing:-0.02em;color:var(--navy)}
+  a{color:var(--royal)}
+  .wrap{max-width:820px;margin:0 auto;padding:0 24px}
+
+  header.bar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .bar-inner{max-width:1120px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Sora',sans-serif;font-weight:800;font-size:19px}
+  .brand .mark{width:30px;height:30px;border-radius:7px;background:var(--navy);display:grid;place-items:center;flex-shrink:0}
+  .brand .mark::after{content:'';width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:11px solid var(--cyan)}
+  .back{color:var(--ink-soft);font-size:14px;font-weight:500}
+  .back:hover{color:var(--navy)}
+
+  .progress{position:sticky;top:64px;z-index:40;height:4px;background:var(--bg-3)}
+  .progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--royal),var(--cyan));transition:width .15s ease}
+
+  #gate{min-height:60vh;display:grid;place-items:center}
+  #locked{min-height:72vh;display:none;place-items:center;text-align:center;padding:40px}
+  #locked h2{font-size:30px;margin-bottom:10px}
+  #locked p{color:var(--ink-soft);margin-bottom:22px;max-width:42ch}
+  .btn{font-family:'Inter';font-size:15px;font-weight:600;padding:13px 26px;border-radius:11px;border:none;cursor:pointer;background:var(--navy);color:#fff;text-decoration:none;display:inline-block;transition:background .2s, transform .12s}
+  .btn:hover{background:var(--navy-2)} .btn:active{transform:translateY(1px)}
+  .btn-cyan{background:var(--cyan);color:var(--navy)} .btn-cyan:hover{background:#27cdec}
+
+  .ghead{position:relative;min-height:380px;display:flex;align-items:flex-end;overflow:hidden;background:var(--navy)}
+  .ghead-img{position:absolute;inset:0;background-size:cover;background-position:center;z-index:0;opacity:.55}
+  .ghead-scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(180deg, rgba(6,24,46,.5) 0%, rgba(6,24,46,.78) 60%, rgba(6,24,46,.96) 100%)}
+  .ghead-inner{position:relative;z-index:2;max-width:820px;margin:0 auto;padding:0 24px 42px;width:100%}
+  .ghead .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:13px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--cyan);margin-bottom:16px}
+  .ghead .eyebrow::before{content:'';width:26px;height:2px;background:var(--cyan)}
+  .ghead h1{font-size:46px;color:#fff;margin-bottom:14px;font-weight:800}
+  .ghead p{font-size:19px;color:#d7e2f0;max-width:54ch}
+  .ghead .timepill{display:inline-flex;align-items:center;gap:8px;margin-top:18px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:13.5px;font-weight:500;padding:7px 14px;border-radius:30px}
+  @media(max-width:680px){.ghead h1{font-size:32px}.ghead{min-height:320px}}
+
+  main{padding:0 0 90px}
+  .sec{padding:48px 0;border-bottom:1px solid var(--line)}
+  .sec:last-child{border-bottom:none}
+  .kicker{display:flex;align-items:center;gap:13px;margin-bottom:20px}
+  .kicker .step-badge{width:44px;height:44px;border-radius:12px;background:linear-gradient(150deg,var(--navy),var(--royal));color:#fff;display:grid;place-items:center;font-family:'Sora';font-weight:700;font-size:18px;flex-shrink:0;box-shadow:0 8px 18px -10px rgba(49,100,185,.8)}
+  .kicker .step-label{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--royal)}
+  .kicker h2{font-size:30px;margin-top:2px}
+  .sec > p{font-size:17px;color:var(--ink-soft);margin-bottom:16px}
+  .sec h3{font-size:20px;margin:28px 0 10px}
+  .sec ul{margin:14px 0 16px 4px;padding:0;list-style:none}
+  .sec ul li{position:relative;padding-left:26px;margin-bottom:10px;font-size:16px;color:var(--ink-soft)}
+  .sec ul li::before{content:'';position:absolute;left:2px;top:9px;width:8px;height:8px;border-radius:50%;background:var(--cyan)}
+  .sec strong{color:var(--ink)}
+
+  .tool-cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:24px 0}
+  .tool-card{background:var(--bg-2);border:1px solid var(--line);border-radius:14px;padding:24px}
+  .tool-card h3{margin:0 0 8px;font-size:19px}
+  .tool-card p{font-size:15px;color:var(--ink-soft);margin:0}
+  .tool-card .badge{font-size:12px;font-weight:600;color:var(--royal);background:var(--cyan-soft);padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:12px}
+  @media(max-width:640px){.tool-cards{grid-template-columns:1fr}}
+
+  .prompt{position:relative;background:var(--navy);border-radius:14px;padding:22px;margin:18px 0;color:#e8eef6}
+  .prompt-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px}
+  .prompt-head .lbl{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--cyan)}
+  .copy-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:13px;font-weight:600;padding:7px 14px;border-radius:8px;cursor:pointer;transition:background .15s;font-family:'Inter';white-space:nowrap}
+  .copy-btn:hover{background:rgba(255,255,255,.22)}
+  .copy-btn.done{background:var(--cyan);color:var(--navy);border-color:var(--cyan)}
+  .prompt pre{white-space:pre-wrap;font-family:'Inter',sans-serif;font-size:14.5px;line-height:1.7;color:#dce6f2;margin:0}
+  .prompt .fill{color:#5fd7f0;font-weight:600}
+
+  .chat{background:var(--bg-2);border:1px solid var(--line);border-radius:16px;padding:20px;margin:22px 0}
+  .chat-row{display:flex;gap:12px;margin-bottom:16px;align-items:flex-start}
+  .chat-row:last-child{margin-bottom:0}
+  .chat-av{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:grid;place-items:center;font-size:13px;font-weight:700;font-family:'Sora'}
+  .chat-av.you{background:var(--navy);color:#fff}
+  .chat-av.ai{background:var(--cyan-soft);color:var(--royal)}
+  .chat-bubble{border-radius:12px;padding:13px 16px;font-size:15px;line-height:1.55}
+  .chat-row.them .chat-bubble{background:#fff;border:1px solid var(--line);color:var(--ink)}
+  .chat-row.you .chat-bubble{background:var(--navy);color:#eaf1f8}
+  .chat-who{font-size:12px;font-weight:600;color:var(--ink-soft);margin-bottom:4px}
+  .chat-row.you .chat-who{color:var(--ink-soft)}
+  .chat-col{flex:1}
+
+  .callout{border-radius:14px;padding:18px 20px;margin:22px 0;display:flex;gap:14px;align-items:flex-start}
+  .callout .ico{width:32px;height:32px;border-radius:9px;flex-shrink:0;display:grid;place-items:center;font-size:16px}
+  .callout h4{font-size:15px;margin-bottom:3px}
+  .callout p{font-size:14.5px;color:var(--ink-soft);margin:0}
+  .tip{background:var(--cyan-soft);border:1px solid #bfe8f2}
+  .tip .ico{background:var(--cyan);color:var(--navy)}
+  .tip h4{color:var(--navy)}
+  .try{background:var(--amber-soft);border:1px solid #f0e2c2}
+  .try .ico{background:var(--amber);color:#fff}
+  .try h4{color:var(--amber)}
+
+  .clicknote{display:flex;gap:12px;align-items:center;background:#fff;border:1.5px dashed var(--royal);border-radius:12px;padding:14px 16px;margin:16px 0;font-size:14.5px;color:var(--ink-soft)}
+  .clicknote .cursor{font-size:20px;animation:tap 1.4s ease-in-out infinite}
+  @keyframes tap{0%,100%{transform:translate(0,0)}50%{transform:translate(3px,3px)}}
+
+  .finish{background:linear-gradient(135deg,var(--navy),var(--royal));border-radius:20px;padding:42px;color:#fff;text-align:center;margin-top:44px;position:relative;overflow:hidden}
+  .finish::before{content:'';position:absolute;top:-50px;right:-30px;width:200px;height:200px;border-radius:50%;background:rgba(12,191,224,.18)}
+  .finish h2{color:#fff;font-size:30px;margin-bottom:12px;position:relative}
+  .finish p{color:#d7e2f0;font-size:17px;max-width:52ch;margin:0 auto 22px;position:relative}
+  .finish .btn-cyan{position:relative}
+
+  footer{padding:40px 0;color:var(--ink-soft);font-size:14px;text-align:center;background:var(--bg-2);border-top:1px solid var(--line)}
+
+  /* video walkthrough */
+  .videowrap{margin:36px 0 8px}
+  .videowrap .vlabel{display:flex;align-items:center;gap:9px;font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--royal);margin-bottom:14px}
+  .videowrap .vlabel::before{content:'';width:24px;height:2px;background:var(--cyan)}
+  .video-frame{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--navy)}
+  .video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .video-placeholder{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#cdddf0;background:linear-gradient(135deg,var(--navy),var(--royal));padding:24px}
+  .video-placeholder .play{width:68px;height:68px;border-radius:50%;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);display:grid;place-items:center;font-size:26px;color:#fff;margin:0 auto 14px}
+  .video-placeholder strong{color:#fff;font-size:17px;display:block;margin-bottom:4px;font-family:'Sora'}
+  .video-placeholder span{font-size:14px}
+
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="bar-inner">
+    <div class="brand"><span class="mark"></span> <span style="color:var(--navy)">Ark</span>&nbsp;<span style="color:var(--cyan)">Ministry AI</span></div>
+    <a class="back" href="../index.html">← Back to dashboard</a>
+  </div>
+</header>
+<div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+
+<div id="gate"><div style="color:var(--ink-soft)">Checking access…</div></div>
+
+<div id="locked">
+  <div>
+    <h2>This guide is for members</h2>
+    <p>Start your $12.99/month membership to unlock this guide, the walkthrough, and the community.</p>
+    <a class="btn" href="../index.html">Go to dashboard</a>
+  </div>
+</div>
+
+<main id="content" style="display:none">
+
+  <div class="ghead">
+    <div class="ghead-img" style="background-image:url('../assets/guide-bible-study.png')"></div>
+    <div class="ghead-scrim"></div>
+    <div class="ghead-inner">
+      <div class="eyebrow">Guide 01 · Beginner friendly</div>
+      <h1>Create a beautiful study guide with AI</h1>
+      <p>Never used AI before? Perfect. By the end of this page you'll have made your own branded, print-ready Bible study guide — just by having a conversation.</p>
+      <div class="timepill">🕊️ About 15 minutes · No tech skills needed</div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- VIDEO WALKTHROUGH (placeholder — swap in your recording) -->
+    <div class="videowrap">
+      <div class="vlabel">Watch it done, start to finish</div>
+      <div class="video-frame">
+        <!--
+          TO ADD YOUR VIDEO: delete the .video-placeholder div below and paste your embed here, e.g.:
+          <iframe src="https://www.youtube.com/embed/VIDEO_ID" title="Walkthrough" allowfullscreen></iframe>
+          (YouTube: use the /embed/ link. Vimeo and Loom give you a similar embed link via Share → Embed.)
+        -->
+        <div class="video-placeholder" id="videoPlaceholder">
+          <div>
+            <div class="play">▶</div>
+            <strong>Video walkthrough coming soon</strong>
+            <span>A screen recording of the whole process, start to finish.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INTRO -->
+    <section class="sec">
+      <div class="kicker">
+        <div class="step-badge">★</div>
+        <div><div class="step-label">Start here</div><h2>First — what even is this?</h2></div>
+      </div>
+      <p>You've probably heard people talk about "AI" or "ChatGPT." Here's all you need to know to begin: these are tools you <strong>talk to like a person</strong>. You type what you want in plain English, and they help you make it. No coding. No special words. If you can text a friend, you can do this.</p>
+      <p>For church materials, two of the best are <strong>Claude</strong> and <strong>ChatGPT</strong>. Either works great for everything on this page — pick whichever you like.</p>
+      <div class="tool-cards">
+        <div class="tool-card">
+          <span class="badge">Recommended</span>
+          <h3>Claude</h3>
+          <p>Made by Anthropic. Wonderful at warm, thoughtful, well-organized writing — and great at formatting it beautifully. Find it at claude.ai.</p>
+        </div>
+        <div class="tool-card">
+          <span class="badge">Also great</span>
+          <h3>ChatGPT</h3>
+          <p>Made by OpenAI. Hugely popular and very capable. Works the same way for everything we'll do here. Find it at chatgpt.com.</p>
+        </div>
+      </div>
+      <p>Both have a free version that's plenty to start. Open one in a new browser tab, make a free account, and keep it open beside this page so you can follow along.</p>
+      <div class="callout tip">
+        <div class="ico">💡</div>
+        <div><h4>The one mindset shift that matters</h4><p>You're not "operating software." You're having a conversation. Talk to it the way you'd ask a knowledgeable assistant for a favor — and when something's not quite right, you just say so. We'll practice that.</p></div>
+      </div>
+    </section>
+
+    <!-- STEP 1 -->
+    <section class="sec">
+      <div class="kicker">
+        <div class="step-badge">1</div>
+        <div><div class="step-label">Step one</div><h2>Gather your handful of details</h2></div>
+      </div>
+      <p>Before we open the AI, jot these down on a sticky note. Having them ready makes the whole thing take two minutes. None of it is complicated — it's just the stuff you already know about your study.</p>
+      <ul>
+        <li><strong>The passage</strong> — book, chapter, and verses (for example, <em>James 1:1–18</em>).</li>
+        <li><strong>Who it's for</strong> — adult small group, youth group, new believers, a women's study, etc.</li>
+        <li><strong>Your church name</strong> — exactly how you'd want it printed.</li>
+        <li><strong>Your brand colors</strong> — if you know them. Don't worry if you don't; you can just say "navy blue and a bright blue accent" or skip it.</li>
+        <li><strong>A tone</strong> — warm and conversational? Reverent and deep? Simple for beginners? Your call.</li>
+      </ul>
+      <div class="callout tip">
+        <div class="ico">💡</div>
+        <div><h4>Don't have brand colors?</h4><p>Totally fine. The AI will choose a tasteful, churchy palette on its own. You can always say "make it more blue" or "use warmer colors" afterward.</p></div>
+      </div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="sec">
+      <div class="kicker">
+        <div class="step-badge">2</div>
+        <div><div class="step-label">Step two</div><h2>Open the AI and start a new chat</h2></div>
+      </div>
+      <p>Go to your AI in the other tab. You'll see a big empty box at the bottom of the screen with text like <em>"Message Claude…"</em> or <em>"Ask anything."</em> That box is where everything happens. You type there, press Enter, and the AI replies right above it — just like a text message thread.</p>
+      <div class="clicknote">
+        <span class="cursor">👆</span>
+        <div>Look for the message box at the <strong>bottom</strong> of the screen. That's your starting line. Click into it.</div>
+      </div>
+      <p>If it's a brand-new conversation, even better — a fresh chat keeps things focused. Now let's give it our request.</p>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="sec">
+      <div class="kicker">
+        <div class="step-badge">3</div>
+        <div><div class="step-label">Step three</div><h2>Paste this — your master prompt</h2></div>
+      </div>
+      <p>This is the heart of it. Copy the text below, paste it into the message box, and fill in the <span style="color:var(--royal);font-weight:600">blue blanks</span> with your details from Step 1. Then press Enter. It asks for a richer, 3–5 page guide with proper page breaks, so it prints cleanly without any fiddling.</p>
+      <div class="prompt">
+        <div class="prompt-head">
+          <span class="lbl">Master prompt — copy &amp; fill the blanks</span>
+          <button class="copy-btn" onclick="copyPrompt(this,'p1')">Copy</button>
+        </div>
+        <pre id="p1">I want you to act as a thoughtful Bible study designer for my church. I'm going to ask you to create a complete, beautifully designed study guide that I can download as a PDF.
+
+Here are my details:
+- Passage: <span class="fill">[YOUR PASSAGE, e.g. James 1:1–18]</span>
+- This study is for: <span class="fill">[YOUR GROUP, e.g. our adult small group]</span>
+- Church name: <span class="fill">[YOUR CHURCH NAME]</span>
+- Brand colors: <span class="fill">[YOUR COLORS, or "you choose something tasteful"]</span>
+- Tone: <span class="fill">[e.g. warm and conversational]</span>
+
+Please create a comprehensive, multi-page study guide as a single self-contained HTML page that I can save and print as a PDF. It should look professionally designed — clean layout, nice fonts, my brand colors, my church name in a header, and generous white space. Format it for 3–5 pages on letter-size paper (8.5 x 11 inches), and put a clean page break between each major section so it prints neatly with no awkward splits.
+
+Include these sections, spread across the pages:
+1. A title page — the study title, passage reference, my church name, and a warm 2–3 sentence welcome
+2. Background &amp; context — historical and cultural notes that help the passage come alive
+3. The key verses, set apart and easy to read
+4. Discussion questions — 7 to 8 questions that move from "what does it say" to "what does it mean" to "how does it change us"
+5. A daily reflection section — a short reflection prompt for each of 3–5 days, each tied to a verse in the passage
+6. A memory verse, with a little space to write it out
+7. A closing prayer prompt, with room for notes
+
+Make it spacious, warm, and genuinely ready to print and hand out. When you're done, briefly tell me how to save it as a PDF.</pre>
+      </div>
+      <div class="callout tip">
+        <div class="ico">💡</div>
+        <div><h4>Why ask for "a single HTML page"?</h4><p>That's the magic words that make the AI build a real, designed document instead of plain text — and HTML is the easiest thing to turn into a clean PDF. You don't need to know what HTML is. You're just asking for it by name.</p></div>
+      </div>
+    </section>
+
+    <!-- STEP 4 -->
+    <section class="sec">
+      <div class="kicker">
+        <div class="step-badge">4</div>
+        <div><div class="step-label">Step four</div><h2>Watch it build — and turn it into a PDF</h2></div>
+      </div>
+      <p>After you press Enter, the AI thinks for a few seconds and then builds your guide right there. In Claude it usually opens in a panel on the right (that's called an "Artifact" — just a fancy word for the document it made). In ChatGPT it appears in the reply, often with a preview.</p>
+      <p>Now to get your PDF, the simplest path works every time:</p>
+      <ul>
+        <li>Look for a <strong>Preview</strong> or <strong>Download</strong> option on the document it created, and open the preview so you can see the designed page.</li>
+        <li>With the preview open, <strong>print the page</strong> (on a Mac press Command + P, on Windows press Ctrl + P).</li>
+        <li>In the print window, where it asks for a printer, choose <strong>"Save as PDF"</strong> instead. Click Save. Done — that's your finished, designed guide.</li>
+      </ul>
+      <div class="clicknote">
+        <span class="cursor">👆</span>
+        <div>The trick most people miss: in the print window, change the "printer" dropdown to <strong>Save as PDF</strong>. That's how a web page becomes a polished file.</div>
+      </div>
+      <p>Because we asked for proper page breaks, your guide should land on 3–5 clean letter-size pages — no awkward splits, no margin tinkering. If the AI's reply included its own download button, you can use that too. Either way, you now have a real multi-page PDF you could hand out this Sunday.</p>
+    </section>
+
+    <!-- STEP 5 — the conversation -->
+    <section class="sec">
+      <div class="kicker">
+        <div class="step-badge">5</div>
+        <div><div class="step-label">Step five · the important part</div><h2>Don't like something? Just say so.</h2></div>
+      </div>
+      <p>This is the skill that changes everything. The first version is almost never the final version — and that's by design. You don't start over. You just <strong>talk back</strong>, the same way you're reading this. The AI remembers what it made and adjusts it.</p>
+      <p>Here's what a real back-and-forth looks like:</p>
+      <div class="chat">
+        <div class="chat-row you">
+          <div class="chat-av you">You</div>
+          <div class="chat-col"><div class="chat-who">You</div><div class="chat-bubble">This looks great! Can you make the header a deeper navy blue and add a little more space between the questions?</div></div>
+        </div>
+        <div class="chat-row them">
+          <div class="chat-av ai">AI</div>
+          <div class="chat-col"><div class="chat-who">The AI</div><div class="chat-bubble">Done! I've deepened the header color and given the discussion questions more breathing room. Here's the updated guide.</div></div>
+        </div>
+        <div class="chat-row you">
+          <div class="chat-av you">You</div>
+          <div class="chat-col"><div class="chat-who">You</div><div class="chat-bubble">Perfect. Could you add two more questions, and make the language simpler so it works for our high schoolers?</div></div>
+        </div>
+        <div class="chat-row them">
+          <div class="chat-av ai">AI</div>
+          <div class="chat-col"><div class="chat-who">The AI</div><div class="chat-bubble">Of course — I added two more questions and simplified the wording throughout for a younger group. Take a look.</div></div>
+        </div>
+      </div>
+      <p>That's the whole secret. You're the director; the AI is your tireless helper. A few things you can always ask for:</p>
+      <ul>
+        <li>"Make it <strong>shorter</strong> / <strong>longer</strong>."</li>
+        <li>"Add our church logo at the top." <em>(then drag your logo image into the chat)</em></li>
+        <li>"Make the tone <strong>warmer</strong>" or "<strong>more reverent</strong>."</li>
+        <li>"Add a section on how this applies to family life."</li>
+        <li>"Change the colors to match our website."</li>
+      </ul>
+      <div class="callout tip">
+        <div class="ico">💡</div>
+        <div><h4>You can't break it</h4><p>There's no wrong thing to type. If a change isn't what you wanted, just say "actually, go back to how it was." Experiment freely — that's how you get comfortable.</p></div>
+      </div>
+    </section>
+
+    <!-- STEP 6 — reuse -->
+    <section class="sec">
+      <div class="kicker">
+        <div class="step-badge">6</div>
+        <div><div class="step-label">Step six</div><h2>Save the prompt — reuse it forever</h2></div>
+      </div>
+      <p>Here's how this becomes a weekly five-minute habit instead of a one-time project. <strong>Copy your master prompt</strong> (the one from Step 3, with your church details already filled in) and paste it somewhere you'll find it again — a note on your phone, a Google Doc, a sticky note in your desk drawer.</p>
+      <p>Next week, the only thing you change is the <strong>passage</strong>. Everything else — your church name, colors, tone — stays the same. Paste, swap the verses, press Enter. A brand-new designed guide in under a minute.</p>
+      <div class="callout tip">
+        <div class="ico">💡</div>
+        <div><h4>Build a little library</h4><p>Save a few versions: one for adult groups, one for youth, one for a women's study. Each is just your master prompt with the "this study is for" line changed.</p></div>
+      </div>
+    </section>
+
+    <!-- TRY THIS — wider possibilities -->
+    <section class="sec">
+      <div class="kicker">
+        <div class="step-badge">✦</div>
+        <div><div class="step-label">Now get creative</div><h2>The same skill makes a hundred other things</h2></div>
+      </div>
+      <p>You just learned something bigger than study guides. You learned how to ask AI to <em>write and design</em> in one go, then refine it by talking. That exact skill works for almost any church material. Try these next:</p>
+      <div class="callout try">
+        <div class="ico">✦</div>
+        <div><h4>A daily devotional</h4><p>Same prompt, swap "study guide" for "a 5-day devotional on this passage, one short reading per day." Beautiful for emailing your congregation through the week.</p></div>
+      </div>
+      <div class="callout try">
+        <div class="ico">✦</div>
+        <div><h4>A "Who's Who" profile</h4><p>Ask for "a one-page designed profile of a person in the Bible — their story, key verses, and what we learn from them." Great for newsletters or a youth wall.</p></div>
+      </div>
+      <div class="callout try">
+        <div class="ico">✦</div>
+        <div><h4>A sermon discussion sheet</h4><p>Paste in your sermon notes and ask for "a designed one-page discussion sheet small groups can use to talk through Sunday's message."</p></div>
+      </div>
+      <div class="callout try">
+        <div class="ico">✦</div>
+        <div><h4>An event flyer or bulletin insert</h4><p>"Design a one-page flyer for our upcoming [event], with these details…" — then refine the colors and wording by chatting, just like you practiced.</p></div>
+      </div>
+      <p>Every one of these uses the exact rhythm you just learned: <strong>tell it what you want, ask for it as a designed page, then talk back until it's right.</strong></p>
+    </section>
+
+    <!-- FINISH -->
+    <div class="finish">
+      <h2>You did it. 🎉</h2>
+      <p>You just made a real, designed study guide using AI — and more importantly, you learned how to do it again with anything. That's a skill that'll serve your ministry for years.</p>
+      <a class="btn-cyan btn" href="../index.html">Back to your guides</a>
+    </div>
+
+  </div>
+</main>
+
+<footer>You're a member of Ark Ministry AI · Helping churches do more with less</footer>
+
+<script>
+const SUPABASE_URL="https://baqmkktggczzyoldlkal.supabase.co";
+const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJhcW1ra3RnZ2N6enlvbGRsa2FsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0ODk4ODksImV4cCI6MjA5NzA2NTg4OX0.8tRWeRM4vRhIMX-UN1sxjFy7FbATC4kDkKTN0zvNHcc";
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
+async function readStatus(userId){
+  for(let i=0;i<3;i++){
+    const {data,error}=await sb.from('profiles').select('subscription_status').eq('id',userId).maybeSingle();
+    if(!error && data){ return data.subscription_status; }
+    if(error){ console.warn('gate read attempt',i+1,error.message); }
+    await new Promise(r=>setTimeout(r,400));
+  }
+  return null;
+}
+(async()=>{
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){ window.location.href="../index.html"; return; }
+  const status=await readStatus(session.user.id);
+  const active=(status==='active');
+  document.getElementById('gate').style.display='none';
+  document.getElementById('content').style.display = active?'block':'none';
+  document.getElementById('locked').style.display = active?'none':'grid';
+})();
+
+const fill=document.getElementById('progressFill');
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  const pct=h.scrollTop/(h.scrollHeight-h.clientHeight)*100;
+  fill.style.width=Math.min(100,Math.max(0,pct))+'%';
+},{passive:true});
+
+function copyPrompt(btn,id){
+  const txt=document.getElementById(id).innerText;
+  navigator.clipboard.writeText(txt).then(()=>{
+    const old=btn.textContent; btn.textContent='✓ Copied'; btn.classList.add('done');
+    setTimeout(()=>{btn.textContent=old;btn.classList.remove('done');},1800);
+  });
+}
+</script>
+</body>
+</html>
