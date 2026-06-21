@@ -96,14 +96,20 @@
 const SUPABASE_URL="https://baqmkktggczzyoldlkal.supabase.co";
 const SUPABASE_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJhcW1ra3RnZ2N6enlvbGRsa2FsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0ODk4ODksImV4cCI6MjA5NzA2NTg4OX0.8tRWeRM4vRhIMX-UN1sxjFy7FbATC4kDkKTN0zvNHcc";
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
+async function readStatus(userId){
+  for(let i=0;i<3;i++){
+    const {data,error}=await sb.from('profiles').select('subscription_status').eq('id',userId).maybeSingle();
+    if(!error && data){ return data.subscription_status; }
+    if(error){ console.warn('gate read attempt',i+1,error.message); }
+    await new Promise(r=>setTimeout(r,400));
+  }
+  return null;
+}
 (async()=>{
   const {data:{session}}=await sb.auth.getSession();
   if(!session){ window.location.href="../index.html"; return; }
-  let active=false;
-  try{
-    const {data:p}=await sb.from('profiles').select('subscription_status').eq('id',session.user.id).single();
-    active = p && p.subscription_status==='active';
-  }catch(e){}
+  const status = await readStatus(session.user.id);
+  const active = (status==='active');
   document.getElementById('gate').style.display='none';
   document.getElementById(active?'content':'locked').style.display = active?'block':'grid';
 })();

@@ -476,14 +476,29 @@ async function manageBilling(){
   }catch(e){ alert('Could not reach billing portal.'); }
 }
 
+async function fetchProfile(userId){
+  // Try a couple times — right after load the auth token can lag a beat,
+  // which makes the very first request go out unauthenticated (RLS 403).
+  for(let attempt=0; attempt<3; attempt++){
+    const { data, error } = await sb
+      .from('profiles')
+      .select('full_name, subscription_status')
+      .eq('id', userId)
+      .maybeSingle();
+    if(!error && data){ return data; }
+    if(error){ console.warn('profile read attempt', attempt+1, error.message); }
+    await new Promise(r=>setTimeout(r, 400)); // brief wait, then retry
+  }
+  return null;
+}
+
 async function boot(){
+  // Make sure the session is fully restored before we query anything.
   const { data:{ session } } = await sb.auth.getSession();
   if(!session){ showPublic(); return; }
-  let status='inactive', name='';
-  try{
-    const { data:profile } = await sb.from('profiles').select('full_name, subscription_status').eq('id', session.user.id).single();
-    if(profile){ status = profile.subscription_status || 'inactive'; name = profile.full_name || ''; }
-  }catch(e){}
+  const profile = await fetchProfile(session.user.id);
+  const status = profile ? (profile.subscription_status || 'inactive') : 'inactive';
+  const name   = profile ? (profile.full_name || '') : '';
   showDashboard(session.user, status, name);
 }
 function showPublic(){
