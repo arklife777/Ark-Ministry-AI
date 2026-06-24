@@ -171,6 +171,42 @@
   @media(max-width:560px){.protip .pt-pop{width:210px}}
 
   @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}}
+
+  /* ============ CINEMATIC HYBRID ENHANCEMENTS ============ */
+  :root{ --navy:#071a30; --glow:rgba(12,191,224,.4); }
+  /* deepen + animate the hero image, stronger cinematic scrim */
+  .ghead{min-height:440px}
+  .ghead-img{opacity:.72;animation:ghKen 24s ease-in-out infinite alternate}
+  @keyframes ghKen{from{transform:scale(1.06)}to{transform:scale(1.14)}}
+  .ghead-scrim{background:linear-gradient(180deg, rgba(4,14,28,.35) 0%, rgba(4,14,28,.72) 55%, rgba(4,14,28,.97) 100%)}
+  /* subtle tech grid over hero */
+  .ghead::after{content:'';position:absolute;inset:0;z-index:1;opacity:.5;pointer-events:none;
+    background-image:linear-gradient(rgba(120,190,240,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(120,190,240,.06) 1px,transparent 1px);
+    background-size:46px 46px;
+    -webkit-mask-image:radial-gradient(120% 90% at 30% 20%,#000 25%,transparent 78%);
+    mask-image:radial-gradient(120% 90% at 30% 20%,#000 25%,transparent 78%)}
+  .ghead h1{font-size:50px;text-shadow:0 2px 30px rgba(0,0,0,.4)}
+  @media(max-width:680px){.ghead h1{font-size:32px}}
+  /* gradient text accent on hero title key word handled inline if present */
+  .ghead .timepill{backdrop-filter:blur(6px)}
+  /* progress bar glow */
+  .progress-fill{box-shadow:0 0 12px -1px var(--glow)}
+  /* gentle scroll-reveal for content sections */
+  @keyframes gFadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .sec{opacity:0;animation:gFadeUp .7s cubic-bezier(.2,.7,.2,1) forwards;animation-timeline:view();animation-range:entry 0% cover 22%}
+  @supports not (animation-timeline:view()){ .sec{opacity:1;animation:none} }
+  /* step badge subtle glow on hover within reading flow */
+  .kicker .step-badge{transition:box-shadow .25s, transform .2s}
+  .sec:hover .kicker .step-badge{box-shadow:0 10px 26px -8px var(--glow);transform:translateY(-1px)}
+  /* finish card shimmer top accent */
+  .finish::after{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,var(--cyan),var(--royal),var(--cyan));background-size:200% auto;animation:gShim 4s linear infinite}
+  @keyframes gShim{to{background-position:200% center}}
+  @media(prefers-reduced-motion:reduce){
+    .ghead-img{animation:none!important}
+    .sec{opacity:1!important;animation:none!important}
+    .finish::after{animation:none!important}
+  }
+
 </style>
 </head>
 <body>

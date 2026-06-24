@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Autopilot Stack — Ark Ministry AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;450;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#071a30; --navy-2:#0d3a68; --royal:#3164b9; --cyan:#0cbfe0; --cyan-soft:#e3f7fc;
+    --ink:#13243a; --ink-soft:#54637a; --bg:#ffffff; --bg-2:#f4f8fc; --bg-3:#eef4fa;
+    --card:#ffffff; --line:#e2eaf3; --ok:#1f9d6b; --radius:16px;
+    --amber-bg:#fdf6e8; --amber-line:#f0e2c2; --amber-ink:#b7791f; --glow:rgba(12,191,224,.4);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:var(--bg-2);line-height:1.6;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,h4{font-family:'Sora',sans-serif;font-weight:700;line-height:1.1;letter-spacing:-.02em;color:var(--navy)}
+  a{color:inherit;text-decoration:none}
+
+  @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+  .reveal{opacity:0}.reveal.in{animation:fadeUp .6s cubic-bezier(.2,.7,.2,1) forwards}
+  @media(prefers-reduced-motion:reduce){.reveal,.reveal.in{opacity:1!important;animation:none!important}*{animation:none!important}}
+
+  header.bar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .bar-inner{max-width:980px;margin:0 auto;padding:0 24px;height:66px;display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:11px;font-family:'Sora';font-weight:800;font-size:20px}
+  .brand .ark{color:var(--navy)}.brand .life{color:var(--cyan)}
+  .brand .mark{width:32px;height:32px;border-radius:8px;background:var(--navy);display:grid;place-items:center;flex-shrink:0}
+  .brand .mark::after{content:"";width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:12px solid var(--cyan)}
+  .back{color:var(--ink-soft);font-size:14px;font-weight:500}.back:hover{color:var(--navy)}
+
+  .dash-hero{background:linear-gradient(135deg,var(--navy),var(--royal));color:#fff;padding:46px 0 64px;position:relative;overflow:hidden}
+  .dash-hero::before{content:"";position:absolute;inset:0;opacity:.5;background-image:linear-gradient(rgba(120,190,240,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(120,190,240,.06) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(90% 100% at 80% 0,#000 20%,transparent 75%);mask-image:radial-gradient(90% 100% at 80% 0,#000 20%,transparent 75%)}
+  .dash-hero .wrap{position:relative;z-index:1}
+  .wrap{max-width:980px;margin:0 auto;padding:0 24px}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan);margin-bottom:14px}
+  .eyebrow::before{content:"";width:26px;height:2px;background:var(--cyan)}
+  .dash-hero h1{font-size:36px;color:#fff;margin-bottom:8px}
+  .dash-hero p{color:#cdddf0;font-size:16px;max-width:62ch}
+
+  .body{margin-top:24px;padding-bottom:80px}
+  .status{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px 22px;margin-bottom:34px;font-size:15px;box-shadow:0 18px 44px -32px rgba(9,43,80,.4)}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px rgba(31,157,107,.16);flex-shrink:0}
+  .status strong{color:var(--navy)}.status .muted{color:var(--ink-soft)}
+
+  .section-label{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:700;margin:0 0 16px;display:flex;align-items:center;gap:12px}
+  .section-label::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  .stack{display:grid;gap:13px;margin-bottom:44px}
+  .piece{display:flex;align-items:center;gap:18px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;transition:transform .18s,box-shadow .25s,border-color .2s}
+  .piece:hover{transform:translateY(-3px);box-shadow:0 22px 46px -30px rgba(9,43,80,.4);border-color:var(--cyan)}
+  .badge{width:46px;height:46px;border-radius:12px;flex-shrink:0;display:grid;place-items:center;font-weight:800;font-size:13px;color:#fff;font-family:'Sora'}
+  .b-ai{background:linear-gradient(135deg,#10a37f,#0d8a6c)}.b-tg{background:linear-gradient(135deg,#29b6f6,#0277bd)}
+  .b-os{background:linear-gradient(135deg,#2f7bf0,#1c4fb0)}.b-do{background:linear-gradient(135deg,#0cbfe0,#1c6fd0)}
+  .b-ds{background:linear-gradient(135deg,#3a6,#274)}
+  .piece-body{flex:1;min-width:0}.piece-body h3{font-size:17px;margin-bottom:2px}.piece-body .role{font-size:14px;color:var(--ink-soft)}
+  .chip{display:inline-block;font-size:11.5px;letter-spacing:.03em;text-transform:uppercase;font-weight:700;padding:3px 10px;border-radius:30px;margin-top:7px;border:1px solid var(--line)}
+  .chip-yours{color:var(--ok)}.chip-ours{color:var(--royal)}.chip-once{color:var(--amber-ink)}
+  .arrow{color:var(--royal);font-size:20px;flex-shrink:0}
+  .meta{font-size:12.5px;color:var(--ink-soft);text-align:right;flex-shrink:0}.meta .who{display:block;font-weight:700;color:var(--ink)}
+
+  .guide{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:0 18px 44px -34px rgba(9,43,80,.4)}
+  .guide-head{background:linear-gradient(135deg,var(--navy),var(--royal));color:#fff;padding:22px 26px}
+  .guide-head h2{color:#fff;font-size:22px}.guide-head p{font-size:14px;color:#cdddf0;margin-top:4px}
+  .guide-body{padding:6px 26px 14px}
+  details{border-bottom:1px solid var(--line)}details:last-child{border-bottom:none}
+  summary{list-style:none;cursor:pointer;padding:17px 0;display:flex;align-items:center;gap:14px;font-size:16.5px;color:var(--navy);font-weight:700}
+  summary::-webkit-details-marker{display:none}
+  summary .num{font-size:13px;font-weight:700;color:var(--royal);border:1.5px solid var(--line);border-radius:8px;width:27px;height:27px;display:grid;place-items:center;flex-shrink:0;font-family:'Sora'}
+  summary .twirl{margin-left:auto;color:var(--ink-soft);transition:.2s}
+  details[open] summary .twirl{transform:rotate(90deg)}
+  .answer{padding:0 0 18px 41px;color:var(--ink-soft);font-size:15px}
+  .answer b{color:var(--ink)}
+  .answer code{font-family:ui-monospace,Menlo,monospace;font-size:.88em;background:var(--cyan-soft);padding:2px 7px;border-radius:5px;color:var(--royal)}
+  .callout{background:var(--amber-bg);border:1px solid var(--amber-line);border-left:4px solid var(--amber-ink);border-radius:10px;padding:13px 17px;margin-top:16px;font-size:14px;color:var(--amber-ink)}
+  .callout b{color:#8a5e12}
+
+  .managed{margin-top:34px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;background:linear-gradient(135deg,var(--navy),var(--navy-2));border-radius:var(--radius);padding:30px 32px;position:relative;overflow:hidden}
+  .managed::after{content:"";position:absolute;top:-50px;right:-30px;width:180px;height:180px;border-radius:50%;background:rgba(12,191,224,.14);animation:floatY 7s ease-in-out infinite}
+  .managed-text{flex:1;min-width:240px;position:relative;z-index:1}
+  .managed-text h3{color:#fff;font-size:21px;margin-bottom:6px}.managed-text p{font-size:15px;color:#cdddf0;max-width:48ch}
+  .managed a{position:relative;z-index:1;background:var(--cyan);color:var(--navy);font-weight:600;padding:13px 22px;border-radius:11px;font-size:15px;white-space:nowrap;transition:background .2s,box-shadow .2s}
+  .managed a:hover{background:#27cdec;box-shadow:0 8px 22px -8px rgba(12,191,224,.7)}
+
+  @media(max-width:560px){.meta{display:none}.dash-hero h1{font-size:28px}.answer{padding-left:0}}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-inner">
+    <a href="../index.html" class="brand"><span class="mark"></span><span><span class="ark">Ark</span> <span class="life">Ministry AI</span></span></a>
+    <a class="back" href="../index.html">← Back to dashboard</a>
+  </div>
+</header>
+
+<div class="dash-hero">
+  <div class="wrap">
+    <span class="eyebrow">Autopilot Agent</span>
+    <h1>My Autopilot Stack</h1>
+    <p>Everything your agent runs on, in one place. Each card opens the real tool in a new tab — your usage, your settings, your account, straight from the source.</p>
+  </div>
+</div>
+
+<div class="wrap body">
+  <div class="status">
+    <span class="dot"></span>
+    <span><strong>Agent active.</strong> <span class="muted">Set up Jun 2026 · posting on schedule · last published 2 days ago.</span></span>
+  </div>
+
+  <div class="section-label">Your stack</div>
+  <div class="stack">
+    <a class="piece reveal" href="https://platform.openai.com/usage" target="_blank" rel="noopener">
+      <span class="badge b-ai">AI</span>
+      <span class="piece-body"><h3>OpenAI — captions &amp; images</h3><span class="role">Writes your captions (GPT-4o) and creates images (GPT Image 2).</span><span class="chip chip-yours">✓ Your account &amp; key</span></span>
+      <span class="meta"><span class="who">You pay</span>pay-as-you-go</span><span class="arrow">→</span>
+    </a>
+    <a class="piece reveal" href="https://t.me" target="_blank" rel="noopener">
+      <span class="badge b-tg">TG</span>
+      <span class="piece-body"><h3>Telegram — talk to your agent</h3><span class="role">Open your bot chat to command it, approve posts, or get alerts. Text it like staff.</span><span class="chip chip-ours">✓ We set this up</span></span>
+      <span class="meta"><span class="who">Free</span>two-way</span><span class="arrow">→</span>
+    </a>
+    <a class="piece reveal" href="https://app.onlysocial.io" target="_blank" rel="noopener">
+      <span class="badge b-os">OS</span>
+      <span class="piece-body"><h3>OnlySocial — publishing</h3><span class="role">Receives the queue and posts to your channels. See scheduled &amp; published posts here.</span><span class="chip chip-once">Lifetime or monthly</span></span>
+      <span class="meta"><span class="who">Your plan</span>your pick</span><span class="arrow">→</span>
+    </a>
+    <a class="piece reveal" href="https://cloud.digitalocean.com/droplets" target="_blank" rel="noopener">
+      <span class="badge b-do">DO</span>
+      <span class="piece-body"><h3>DigitalOcean — the server</h3><span class="role">The little machine that runs the agent around the clock. The $4/mo droplet.</span><span class="chip chip-yours">✓ Your account</span></span>
+      <span class="meta"><span class="who">You pay</span>~$4/mo</span><span class="arrow">→</span>
+    </a>
+    <a class="piece reveal" href="https://platform.deepseek.com" target="_blank" rel="noopener">
+      <span class="badge b-ds">DS</span>
+      <span class="piece-body"><h3>DeepSeek — the brain</h3><span class="role">Supervises the schedule and decides what goes in the queue. Low-cost orchestration.</span><span class="chip chip-ours">✓ We set this up</span></span>
+      <span class="meta"><span class="who">Pennies</span>per month</span><span class="arrow">→</span>
+    </a>
+  </div>
+
+  <div class="section-label">Keeping it running</div>
+  <div class="guide">
+    <div class="guide-head">
+      <h2>Maintenance guide</h2>
+      <p>Light upkeep — no code, nothing scary. The five things you might ever need to do.</p>
+    </div>
+    <div class="guide-body">
+      <details open><summary><span class="num">1</span>Check the agent is running<span class="twirl">›</span></summary>
+        <div class="answer">Open <b>OnlySocial</b> and look at your scheduled posts. If you see posts lined up for the days ahead, the agent is working. The status strip at the top of this page also shows the last time it published. Or just text your <b>Telegram</b> bot "status" and it'll tell you. If posts have stopped, jump to step 3.</div></details>
+      <details><summary><span class="num">2</span>Talk to it on Telegram<span class="twirl">›</span></summary>
+        <div class="answer">Your agent has its own Telegram chat. Open it anytime to give instructions in plain language — <code>make a post about Sunday's potluck</code>, <code>show me what's queued</code>, <code>approve all</code>, or <code>skip this week</code>. It replies right back. This is the easiest way to steer the agent day to day without touching any dashboard.</div></details>
+      <details><summary><span class="num">3</span>Restart it if it stops<span class="twirl">›</span></summary>
+        <div class="answer">Open <b>DigitalOcean</b> and find your droplet. If it shows as off, click <b>Power On</b> — the agent picks back up on its own. If it was already on but posts stopped, the cause is almost always step 5 (an OpenAI billing limit), so check there next.
+        <div class="callout"><b>Don't delete or rebuild the droplet.</b> Powering off and on is safe. Destroying it removes the agent.</div></div></details>
+      <details><summary><span class="num">4</span>Move to a bigger server (only if you outgrow it)<span class="twirl">›</span></summary>
+        <div class="answer">The $4 droplet handles a normal posting schedule easily. If you ramp way up across many channels, open the droplet in <b>DigitalOcean</b> → <b>Resize</b> → pick the next size up → confirm. Takes a couple minutes; nothing else changes. Most churches never need this.</div></details>
+      <details><summary><span class="num">5</span>Swap or refill your OpenAI key<span class="twirl">›</span></summary>
+        <div class="answer">Captions and images bill to your own OpenAI account, so they stop if it hits a spending limit. Open <b>OpenAI</b> → <b>Usage</b> to see your balance, or <b>Billing</b> to add funds. If you make a new key, send it to us and we'll drop it in — quick managed task, or we'll show you where it lives.
+        <div class="callout"><b>Heads up:</b> OpenAI is the one cost that's truly yours and usage-based — normally just a few dollars a month. If posting suddenly stops, check here first.</div></div></details>
+    </div>
+  </div>
+
+  <div class="managed">
+    <div class="managed-text">
+      <h3>Don't want to think about any of this?</h3>
+      <p>Add ongoing management and we'll watch the server, handle upgrades, and keep everything posting — so you never touch a dashboard unless you want to.</p>
+    </div>
+    <a href="index.html#pricing">Add management →</a>
+  </div>
+</div>
+
+<script>
+  (function(){
+    const els=document.querySelectorAll('.reveal');
+    if(!('IntersectionObserver' in window)){els.forEach(e=>e.classList.add('in'));return;}
+    const io=new IntersectionObserver((ents)=>{ents.forEach(en=>{if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});},{threshold:.12});
+    els.forEach(e=>io.observe(e));
+  })();
+</script>
+</body>
+</html>
